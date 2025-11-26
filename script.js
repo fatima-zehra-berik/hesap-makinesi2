@@ -94,5 +94,23 @@ function handleAction(action) {
     screen.innerText = result;
     currentInput = result.toString();
     resultDisplayed = true;
+    showConfetti();
+    showWelcomeText();
   }
+}
+function showConfetti() {
+  confetti({
+    particleCount: 120,
+    spread: 100,
+    origin: { y: 0.6 }
+  });
+}
+
+function showWelcomeText() {
+  const text = document.getElementById("welcome-text");
+  text.style.opacity = "1";
+
+  setTimeout(() => {
+    text.style.opacity = "0";
+  }, 1500);
 }
