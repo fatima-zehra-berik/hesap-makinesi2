@@ -2,96 +2,114 @@
 <html lang="tr">
 <head>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XFEMNLV7D"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4XFEMNLV7D"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-4XFEMNLV7D');
+  </script>
 
-  gtag('config', 'G-4XFEMNLV7D');
-</script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Basit Hesap Makinesi</title>
+
+  <!-- Dış CSS dosyan -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Ziyaretçi sayacı stili -->
+  <style>
+    #visitor-counter {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+      font-family: Arial, sans-serif;
+      z-index: 9999;
+    }
+  </style>
 </head>
 <body>
   <div class="calculator">
     <div id="screen" class="screen">0</div>
+
     <div class="buttons">
+      <!-- 1. satır -->
       <button class="btn" data-action="clear">C</button>
       <button class="btn" data-action="back">⌫</button>
       <button class="btn" data-action="percent">%</button>
       <button class="btn op" data-action="/">÷</button>
 
+      <!-- 2. satır: yeni özellikler -->
+      <button class="btn" data-action="square">x²</button>
+      <button class="btn" data-action="sqrt">√x</button>
+      <button class="btn" data-action="sign">±</button>
+      <button class="btn op" data-action="*">×</button>
+
+      <!-- 3. satır -->
       <button class="btn" data-number="7">7</button>
       <button class="btn" data-number="8">8</button>
       <button class="btn" data-number="9">9</button>
-      <button class="btn op" data-action="*">×</button>
+      <button class="btn op" data-action="-">−</button>
 
+      <!-- 4. satır -->
       <button class="btn" data-number="4">4</button>
       <button class="btn" data-number="5">5</button>
       <button class="btn" data-number="6">6</button>
-      <button class="btn op" data-action="-">−</button>
-
-      <button class="btn" data-number="1">1</button>
-      <button class="btn" data-number="2">2</button>
-      <button class="btn" data-number="3">3</button>
       <button class="btn op" data-action="+">+</button>
 
+      <!-- 5. satır -->
       <button class="btn wide" data-number="0">0</button>
       <button class="btn" data-number=".">.</button>
       <button class="btn equals" data-action="=">=</button>
     </div>
   </div>
+
   <!-- Ziyaretçi Sayacı -->
-<div id="visitor-counter">Ziyaretçi: Yükleniyor...</div>
+  <div id="visitor-counter">Ziyaretçi: Yükleniyor...</div>
 
-<style>
-  #visitor-counter {
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 6px;
-    font-family: Arial, sans-serif;
-    z-index: 9999;
-  }
-</style>
+  <!-- Ziyaretçi sayacı scripti -->
+  <script>
+    const API_URL = "https://api.countapi.xyz";
+    const KEY = "hesap-makinesi-ziyaret";
 
-<script>
-  const API_URL = "https://api.countapi.xyz";
+    const lastVisit = localStorage.getItem("lastVisit");
+    const now = new Date().getTime(); // ms cinsinden
 
-  const KEY = "hesap-makinesi-ziyaret";
+    // 1 gün = 86400000 ms
+    if (!lastVisit || now - lastVisit > 86400000) {
+      // Bugün ilk giriş -> sayaç artır
+      fetch(`${API_URL}/hit/fatima-zehra-berik/${KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("visitor-counter").innerText =
+            "Ziyaretçi: " + data.value;
+          localStorage.setItem("lastVisit", now);
+        })
+        .catch(() => {
+          document.getElementById("visitor-counter").innerText =
+            "Ziyaretçi: -";
+        });
+    } else {
+      // Bugün daha önce girmiş -> sayaç değerini sadece oku
+      fetch(`${API_URL}/get/fatima-zehra-berik/${KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("visitor-counter").innerText =
+            "Ziyaretçi: " + data.value;
+        })
+        .catch(() => {
+          document.getElementById("visitor-counter").innerText =
+            "Ziyaretçi: -";
+        });
+    }
+  </script>
 
-  const lastVisit = localStorage.getItem("lastVisit");
-
-  const now = new Date().getTime();
-
-  // 1 gün = 86400000 ms
-  if (!lastVisit || now - lastVisit > 86400000) {
-
-    fetch(`${API_URL}/hit/fatima-zehra-berik/${KEY}`)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("visitor-counter").innerText =
-          "Ziyaretçi: " + data.value;
-        localStorage.setItem("lastVisit", now);
-      });
-
-  } else {
-
-    fetch(`${API_URL}/get/fatima-zehra-berik/${KEY}`)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("visitor-counter").innerText =
-          "Ziyaretçi: " + data.value;
-      });
-  }
-</script>
+  <!-- Hesap makinesinin beyni -->
   <script src="script.js"></script>
 </body>
 </html>

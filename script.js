@@ -1,55 +1,98 @@
-const screen = document.getElementById('screen');
-let current = '';
-let resultShown = false;
+const screen = document.getElementById("screen");
+const buttons = document.querySelectorAll(".btn");
 
-function updateScreen(text){
-  screen.textContent = text || '0';
-}
+let currentInput = "";
+let currentOperator = "";
+let firstValue = "";
+let secondValue = "";
+let resultDisplayed = false;
 
-function safeEval(expr){
-  try {
-    expr = expr.replace(/%/g, '/100');
-    const val = Function('"use strict"; return (' + expr + ')')();
-    if (!isFinite(val)) throw new Error('math error');
-    return val;
-  } catch(e) {
-    return 'Error';
-  }
-}
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    const number = button.dataset.number;
+    const action = button.dataset.action;
 
-document.querySelectorAll('.btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const num = btn.getAttribute('data-number');
-    const action = btn.getAttribute('data-action');
-
-    if (num !== null) {
-      if (resultShown) { current = ''; resultShown = false; }
-      if (num === '.' && current.slice(-1) === '.') return;
-      current += num;
-      updateScreen(current);
-      return;
+    if (number !== undefined) {
+      if (resultDisplayed) {
+        currentInput = "";
+        resultDisplayed = false;
+      }
+      currentInput += number;
+      screen.innerText = currentInput;
     }
 
-    if (action) {
-      if (action === 'clear') {
-        current = '';
-        updateScreen('0');
-        return;
-      }
-      if (action === 'back') {
-        current = current.slice(0, -1);
-        updateScreen(current || '0');
-        return;
-      }
-      if (action === '=') {
-        const res = safeEval(current || '0');
-        updateScreen(res);
-        current = String(res === 'Error' ? '' : res);
-        resultShown = true;
-        return;
-      }
-      current += action;
-      updateScreen(current);
+    if (action !== undefined) {
+      handleAction(action);
     }
   });
 });
+
+function handleAction(action) {
+
+  if (action === "clear") {
+    currentInput = "";
+    firstValue = "";
+    secondValue = "";
+    currentOperator = "";
+    screen.innerText = "0";
+    return;
+  }
+
+  if (action === "back") {
+    currentInput = currentInput.slice(0, -1);
+    screen.innerText = currentInput || "0";
+    return;
+  }
+
+  if (action === "percent") {
+    currentInput = (parseFloat(currentInput) / 100).toString();
+    screen.innerText = currentInput;
+    return;
+  }
+
+  if (action === "square") {
+    currentInput = (parseFloat(currentInput) ** 2).toString();
+    screen.innerText = currentInput;
+    resultDisplayed = true;
+    return;
+  }
+
+  if (action === "sqrt") {
+    currentInput = Math.sqrt(parseFloat(currentInput)).toString();
+    screen.innerText = currentInput;
+    resultDisplayed = true;
+    return;
+  }
+
+  if (action === "sign") {
+    currentInput = (parseFloat(currentInput) * -1).toString();
+    screen.innerText = currentInput;
+    return;
+  }
+
+  if (action === "+" || action === "-" || action === "*" || action === "/") {
+    firstValue = currentInput;
+    currentOperator = action;
+    currentInput = "";
+    return;
+  }
+
+  if (action === "=") {
+    secondValue = currentInput;
+    let result = 0;
+
+    const num1 = parseFloat(firstValue);
+    const num2 = parseFloat(secondValue);
+
+    switch (currentOperator) {
+      case "+": result = num1 + num2; break;
+      case "-": result = num1 - num2; break;
+      case "*": result = num1 * num2; break;
+      case "/": result = num1 / num2; break;
+    }
+
+    screen.innerText = result;
+    currentInput = result.toString();
+    resultDisplayed = true;
+  }
+}
