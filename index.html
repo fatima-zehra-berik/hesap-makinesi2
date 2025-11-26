@@ -44,7 +44,54 @@
       <button class="btn equals" data-action="=">=</button>
     </div>
   </div>
+  <!-- Ziyaretçi Sayacı -->
+<div id="visitor-counter">Ziyaretçi: Yükleniyor...</div>
 
+<style>
+  #visitor-counter {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    font-family: Arial, sans-serif;
+    z-index: 9999;
+  }
+</style>
+
+<script>
+  const API_URL = "https://api.countapi.xyz";
+
+  const KEY = "hesap-makinesi-ziyaret";
+
+  const lastVisit = localStorage.getItem("lastVisit");
+
+  const now = new Date().getTime();
+
+  // 1 gün = 86400000 ms
+  if (!lastVisit || now - lastVisit > 86400000) {
+
+    fetch(`${API_URL}/hit/fatima-zehra-berik/${KEY}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("visitor-counter").innerText =
+          "Ziyaretçi: " + data.value;
+        localStorage.setItem("lastVisit", now);
+      });
+
+  } else {
+
+    fetch(`${API_URL}/get/fatima-zehra-berik/${KEY}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("visitor-counter").innerText =
+          "Ziyaretçi: " + data.value;
+      });
+  }
+</script>
   <script src="script.js"></script>
 </body>
 </html>
